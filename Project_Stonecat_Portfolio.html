@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Stonecat — Roshan Sapkota</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #07090F;
+    --surface:   #0D1117;
+    --surface2:  #131920;
+    --border:    #1E2A38;
+    --amber:     #F59E0B;
+    --amber-dim: #92400E;
+    --blue:      #38BDF8;
+    --blue-dim:  #0C4A6E;
+    --green:     #34D399;
+    --text:      #E2E8F0;
+    --muted:     #64748B;
+    --faint:     #1E2A38;
+    --red:       #F87171;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE OVERLAY ───────────────────────────────── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 0; opacity: 0.4;
+  }
+
+  /* ── TYPOGRAPHY ──────────────────────────────────── */
+  h1, h2, h3, h4 { font-family: 'Syne', sans-serif; line-height: 1.15; }
+  code, .mono { font-family: 'JetBrains Mono', monospace; }
+
+  /* ── LAYOUT ──────────────────────────────────────── */
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 2rem; }
+  section { position: relative; z-index: 1; }
+
+  /* ── HERO ────────────────────────────────────────── */
+  #hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    justify-content: center;
+    padding: 5rem 2rem 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(var(--faint) 1px, transparent 1px),
+      linear-gradient(90deg, var(--faint) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 20%, transparent 100%);
+    opacity: 0.4;
+  }
+
+  .hero-glow {
+    position: absolute;
+    top: -20%; left: 50%; transform: translateX(-50%);
+    width: 800px; height: 500px;
+    background: radial-gradient(ellipse, rgba(245,158,11,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem; font-weight: 400;
+    color: var(--amber);
+    border: 1px solid var(--amber-dim);
+    background: rgba(245,158,11,0.06);
+    padding: 5px 14px; border-radius: 2px;
+    letter-spacing: 0.12em;
+    margin-bottom: 2rem;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .badge::before { content: '◈'; font-size: 0.65rem; }
+
+  h1.hero-title {
+    font-size: clamp(3.5rem, 8vw, 7rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 0.95;
+    margin-bottom: 1.5rem;
+    animation: fadeUp 0.7s 0.1s ease both;
+  }
+
+  .title-cat { color: var(--amber); }
+  .title-project { color: var(--text); opacity: 0.15; font-size: 0.45em; display: block; margin-bottom: 0.2em; letter-spacing: 0.15em; font-weight: 600; }
+
+  .hero-tagline {
+    font-size: 1.15rem;
+    color: var(--muted);
+    max-width: 640px;
+    margin-bottom: 3rem;
+    animation: fadeUp 0.7s 0.2s ease both;
+    line-height: 1.8;
+  }
+
+  .hero-meta {
+    display: flex; flex-wrap: wrap; gap: 2rem;
+    animation: fadeUp 0.7s 0.3s ease both;
+  }
+
+  .meta-item { display: flex; flex-direction: column; gap: 3px; }
+  .meta-label { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--muted); letter-spacing: 0.15em; text-transform: uppercase; }
+  .meta-value { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 600; color: var(--text); }
+
+  .divider-v { width: 1px; background: var(--border); align-self: stretch; }
+
+  .scroll-hint {
+    position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--muted);
+    letter-spacing: 0.12em; animation: fadeUp 1s 0.8s ease both;
+  }
+
+  .scroll-line {
+    width: 1px; height: 40px;
+    background: linear-gradient(to bottom, var(--amber), transparent);
+    animation: scrollPulse 2s ease infinite;
+  }
+
+  /* ── SECTION HEADERS ─────────────────────────────── */
+  .section-header {
+    display: flex; align-items: center; gap: 1.2rem;
+    margin-bottom: 3rem;
+  }
+
+  .section-number {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem; color: var(--amber);
+    letter-spacing: 0.1em; opacity: 0.7;
+    white-space: nowrap;
+  }
+
+  .section-line { flex: 1; height: 1px; background: var(--border); }
+
+  h2.section-title {
+    font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  /* ── CARDS ───────────────────────────────────────── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+
+  .card:hover { border-color: var(--amber-dim); transform: translateY(-2px); }
+
+  .card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--amber), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .card:hover::before { opacity: 1; }
+
+  /* ── PROBLEM / SOLUTION ──────────────────────────── */
+  #problem { padding: 6rem 0; }
+
+  .problem-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 2px;
+  }
+
+  .prob-block {
+    background: var(--surface); padding: 2.5rem;
+    position: relative;
+  }
+
+  .prob-block.left { border-right: 1px solid var(--border); }
+
+  .prob-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem; letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .prob-label.red { color: var(--red); }
+  .prob-label.green { color: var(--green); }
+
+  .prob-list { list-style: none; display: flex; flex-direction: column; gap: 1rem; }
+
+  .prob-list li {
+    display: flex; gap: 12px; align-items: flex-start;
+    font-size: 0.93rem; color: var(--text); opacity: 0.85;
+  }
+
+  .prob-list li::before {
+    content: attr(data-icon);
+    font-size: 0.8rem; margin-top: 3px; flex-shrink: 0;
+  }
+
+  /* ── ARCHITECTURE ────────────────────────────────── */
+  #architecture { padding: 6rem 0; background: var(--surface); }
+
+  .arch-diagram {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 3rem 2rem;
+    overflow-x: auto;
+  }
+
+  /* ── SYSTEMS ─────────────────────────────────────── */
+  #systems { padding: 6rem 0; }
+
+  .systems-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+  }
+
+  .system-card { position: relative; }
+
+  .system-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 3rem; font-weight: 300;
+    color: var(--faint);
+    position: absolute; top: 1rem; right: 1.5rem;
+    line-height: 1;
+    transition: color 0.3s;
+  }
+
+  .system-card:hover .system-num { color: rgba(245,158,11,0.15); }
+
+  .system-tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem; letter-spacing: 0.15em;
+    color: var(--blue); background: rgba(56,189,248,0.07);
+    border: 1px solid rgba(56,189,248,0.2);
+    padding: 3px 10px; border-radius: 2px;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+  }
+
+  .system-card h3 {
+    font-size: 1.25rem; font-weight: 700;
+    margin-bottom: 0.8rem; color: var(--text);
+  }
+
+  .system-card p { font-size: 0.9rem; color: var(--muted); line-height: 1.75; margin-bottom: 1.2rem; }
+
+  .tech-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  .pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem; padding: 3px 10px; border-radius: 2px;
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--muted); letter-spacing: 0.05em;
+  }
+
+  .system-card.featured {
+    grid-column: span 2;
+    background: linear-gradient(135deg, var(--surface) 0%, rgba(245,158,11,0.03) 100%);
+    border-color: rgba(245,158,11,0.2);
+  }
+
+  /* ── DECISIONS ───────────────────────────────────── */
+  #decisions { padding: 6rem 0; background: var(--surface); }
+
+  .decision-table { width: 100%; border-collapse: collapse; }
+
+  .decision-table th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--muted);
+    padding: 0.8rem 1.2rem; text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .decision-table td {
+    padding: 1.1rem 1.2rem;
+    border-bottom: 1px solid var(--faint);
+    font-size: 0.88rem; vertical-align: top;
+  }
+
+  .decision-table tr:hover td { background: rgba(245,158,11,0.02); }
+
+  .decision-table td:first-child { color: var(--amber); font-weight: 600; font-family: 'Syne', sans-serif; }
+  .decision-table td:nth-child(2) { color: var(--red); opacity: 0.8; }
+  .decision-table td:nth-child(3) { color: var(--green); opacity: 0.85; }
+  .decision-table td:last-child { color: var(--muted); font-size: 0.82rem; }
+
+  /* ── IMPACT ──────────────────────────────────────── */
+  #impact { padding: 6rem 0; }
+
+  .impact-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
+    background: var(--border); border: 1px solid var(--border);
+  }
+
+  .impact-cell {
+    background: var(--surface); padding: 2.5rem;
+    display: flex; flex-direction: column; gap: 0.8rem;
+  }
+
+  .impact-metric {
+    font-family: 'Syne', sans-serif;
+    font-size: 3rem; font-weight: 800;
+    color: var(--amber); line-height: 1;
+  }
+
+  .impact-label {
+    font-size: 0.88rem; color: var(--text); font-weight: 500;
+  }
+
+  .impact-sub { font-size: 0.8rem; color: var(--muted); }
+
+  /* ── STACK ───────────────────────────────────────── */
+  #stack { padding: 6rem 0; background: var(--surface); }
+
+  .stack-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;
+  }
+
+  .stack-group { display: flex; flex-direction: column; gap: 0.5rem; }
+
+  .stack-group-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem; color: var(--amber);
+    letter-spacing: 0.15em; text-transform: uppercase;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .stack-item {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 0.85rem; color: var(--text);
+    padding: 8px 12px;
+    background: var(--bg);
+    border: 1px solid var(--faint);
+    border-radius: 3px;
+    transition: border-color 0.2s;
+  }
+
+  .stack-item:hover { border-color: var(--border); }
+
+  .stack-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .dot-amber { background: var(--amber); }
+  .dot-blue  { background: var(--blue); }
+  .dot-green { background: var(--green); }
+  .dot-red   { background: var(--red); }
+
+  /* ── SKILLS PROOF ────────────────────────────────── */
+  #skills { padding: 6rem 0; }
+
+  .skills-grid {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem;
+  }
+
+  .skill-card { padding: 1.5rem; }
+
+  .skill-icon {
+    font-size: 1.5rem; margin-bottom: 1rem;
+    display: block;
+  }
+
+  .skill-card h4 {
+    font-size: 0.95rem; font-weight: 700;
+    color: var(--text); margin-bottom: 0.5rem;
+  }
+
+  .skill-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.65; }
+
+  /* ── IDENTITY FOOTER ─────────────────────────────── */
+  #identity {
+    padding: 5rem 0 3rem;
+    border-top: 1px solid var(--border);
+    background: var(--bg);
+  }
+
+  .identity-inner {
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 2rem;
+  }
+
+  .identity-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.8rem; font-weight: 800;
+    color: var(--text);
+  }
+
+  .identity-role {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem; color: var(--amber);
+    letter-spacing: 0.12em; margin-top: 4px;
+  }
+
+  .contact-block { display: flex; flex-direction: column; gap: 6px; text-align: right; }
+
+  .contact-item {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem; color: var(--muted);
+  }
+
+  .contact-item span { color: var(--text); }
+
+  .acs-badges { display: flex; flex-direction: column; gap: 4px; }
+
+  .acs-badge {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.65rem;
+    padding: 4px 10px; border-radius: 2px;
+    border: 1px solid var(--border); color: var(--green);
+    background: rgba(52,211,153,0.04);
+    letter-spacing: 0.08em;
+  }
+
+  /* ── ANIMATIONS ──────────────────────────────────── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.3; transform: scaleY(1); }
+    50%       { opacity: 1;   transform: scaleY(1.2); }
+  }
+
+  .reveal {
+    opacity: 0; transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── RESPONSIVE ──────────────────────────────────── */
+  @media (max-width: 768px) {
+    .problem-grid, .systems-grid, .impact-grid, .stack-grid, .skills-grid {
+      grid-template-columns: 1fr;
+    }
+    .system-card.featured { grid-column: span 1; }
+    .impact-grid { background: none; border: none; gap: 1rem; }
+    .identity-inner { flex-direction: column; text-align: left; }
+    .contact-block { text-align: left; }
+  }
+
+  /* ── NAV ─────────────────────────────────────────── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 1rem 2rem;
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(7,9,15,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(30,42,56,0.5);
+  }
+
+  .nav-logo {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem; color: var(--amber);
+    letter-spacing: 0.1em;
+  }
+
+  .nav-links {
+    display: flex; gap: 2rem; list-style: none;
+  }
+
+  .nav-links a {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem; color: var(--muted);
+    text-decoration: none; letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--amber); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">◈ STONECAT</div>
+  <ul class="nav-links">
+    <li><a href="#problem">Problem</a></li>
+    <li><a href="#architecture">Architecture</a></li>
+    <li><a href="#systems">Systems</a></li>
+    <li><a href="#impact">Impact</a></li>
+    <li><a href="#identity">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- ═══════════════════════════ HERO ═══════════════════════════ -->
+<section id="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="container">
+    <div class="badge">CASE STUDY — AI SYSTEMS ARCHITECTURE — 2024</div>
+    <h1 class="hero-title">
+      <span class="title-project">PROJECT</span>
+      <span class="title-cat">STONECAT</span>
+    </h1>
+    <p class="hero-tagline">
+      A ground-up AI-powered inventory intelligence system — architected, engineered, and deployed as a local-first, zero-dependency platform eliminating cloud AI costs, legacy integration failures, and manual data workflows.
+    </p>
+    <div class="hero-meta">
+      <div class="meta-item">
+        <span class="meta-label">Role</span>
+        <span class="meta-value">Lead AI Solutions Architect</span>
+      </div>
+      <div class="divider-v"></div>
+      <div class="meta-item">
+        <span class="meta-label">Client</span>
+        <span class="meta-value">SMG Stone Gallery, Sydney</span>
+      </div>
+      <div class="divider-v"></div>
+      <div class="meta-item">
+        <span class="meta-label">Timeline</span>
+        <span class="meta-value">2024 – Present</span>
+      </div>
+      <div class="divider-v"></div>
+      <div class="meta-item">
+        <span class="meta-label">Type</span>
+        <span class="meta-value">Full-Stack AI System</span>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <span>SCROLL</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ PROBLEM / SOLUTION ═══════════════════ -->
+<section id="problem" style="padding: 6rem 0;">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-number">01 —</span>
+      <h2 class="section-title">The Problem</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="problem-grid reveal">
+      <div class="prob-block left">
+        <div class="prob-label red">⬡ Before — System Failures</div>
+        <ul class="prob-list">
+          <li data-icon="✗">Legacy ERP (Fishbowl) exposed an unreliable REST/XML socket API — frequent sync failures caused stale inventory data across the business</li>
+          <li data-icon="✗">Recurring cloud AI API costs for data processing with no guarantee of data privacy or sovereignty</li>
+          <li data-icon="✗">Unstructured product data (free-text "Stone Codes") made filtering, searching, and catalogue management impossible</li>
+          <li data-icon="✗">Pagination artifacts, metadata inconsistencies, and pricing logic conflicts corrupted the data layer</li>
+          <li data-icon="✗">Sales teams had no real-time inventory access in the field — reliant on manual lookups and static reports</li>
+          <li data-icon="✗">No automation: every data sync was a manual process requiring human intervention</li>
+        </ul>
+      </div>
+      <div class="prob-block">
+        <div class="prob-label green">⬡ After — System Capabilities</div>
+        <ul class="prob-list">
+          <li data-icon="✓">Fishbowl API bypassed entirely — replaced with a resilient CSV-to-Supabase bridge with zero sync failures</li>
+          <li data-icon="✓">Local-first LLM (DeepSeek-R1 via Ollama) deployed on-premises — zero cloud AI cost, full data sovereignty</li>
+          <li data-icon="✓">Proprietary Stone Code parser decomposes unstructured identifiers into structured relational attributes enabling advanced filtering</li>
+          <li data-icon="✓">Automated multi-stage cleaning pipeline eliminates all pagination artifacts, metadata drift, and pricing conflicts</li>
+          <li data-icon="✓">React Native mobile app gives sales team real-time inventory access from any device, anywhere</li>
+          <li data-icon="✓">macOS Launchd automation delivers 24/7 background sync with self-recovery on failure</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════ ARCHITECTURE ══════════════════════════ -->
+<section id="architecture">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-number">02 —</span>
+      <h2 class="section-title">System Architecture</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="arch-diagram reveal">
+      <svg viewBox="0 0 900 480" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+        <defs>
+          <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#F59E0B" opacity="0.7"/>
+          </marker>
+          <marker id="arrBlue" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#38BDF8" opacity="0.7"/>
+          </marker>
+          <marker id="arrGreen" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#34D399" opacity="0.7"/>
+          </marker>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+            <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+
+        <!-- BG Labels -->
+        <text x="450" y="24" fill="#1E2A38" font-family="JetBrains Mono" font-size="10" text-anchor="middle" letter-spacing="3">LOCAL INFRASTRUCTURE</text>
+        <rect x="10" y="32" width="880" height="430" rx="3" fill="none" stroke="#1E2A38" stroke-width="1"/>
+
+        <!-- ── SOURCE: Fishbowl ERP ── -->
+        <rect x="30" y="60" width="160" height="70" rx="3" fill="#131920" stroke="#374151" stroke-width="1"/>
+        <text x="110" y="84" fill="#9CA3AF" font-family="JetBrains Mono" font-size="9" text-anchor="middle" letter-spacing="1">LEGACY ERP</text>
+        <text x="110" y="102" fill="#E2E8F0" font-family="Syne, sans-serif" font-size="13" font-weight="700" text-anchor="middle">Fishbowl</text>
+        <text x="110" y="118" fill="#6B7280" font-family="JetBrains Mono" font-size="8" text-anchor="middle">REST / XML Socket</text>
+
+        <!-- BYPASS marker -->
+        <rect x="207" y="78" width="54" height="20" rx="2" fill="#450A0A" stroke="#7F1D1D" stroke-width="1"/>
+        <text x="234" y="92" fill="#FCA5A5" font-family="JetBrains Mono" font-size="7.5" text-anchor="middle" font-weight="600">BYPASSED</text>
+
+        <!-- Arrow: Fishbowl → CSV Bridge (strikethrough style) -->
+        <line x1="192" y1="95" x2="265" y2="95" stroke="#4B0000" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <line x1="192" y1="90" x2="265" y2="100" stroke="#7F1D1D" stroke-width="1" opacity="0.5"/>
+
+        <!-- ── CSV BRIDGE ── -->
+        <rect x="265" y="60" width="160" height="70" rx="3" fill="#131920" stroke="#F59E0B" stroke-width="1.5" filter="url(#glow)"/>
+        <text x="345" y="84" fill="#F59E0B" font-family="JetBrains Mono" font-size="9" text-anchor="middle" letter-spacing="1">API BYPASS</text>
+        <text x="345" y="102" fill="#E2E8F0" font-family="Syne, sans-serif" font-size="13" font-weight="700" text-anchor="middle">CSV Bridge</text>
+        <text x="345" y="118" fill="#6B7280" font-family="JetBrains Mono" font-size="8" text-anchor="middle">Python 3.12 extractor</text>
+
+        <!-- Arrow: CSV → ETL -->
+        <line x1="425" y1="95" x2="490" y2="95" stroke="#F59E0B" stroke-width="1.5" opacity="0.6" marker-end="url(#arr)"/>
+
+        <!-- ── ETL PIPELINE ── -->
+        <rect x="490" y="40" width="160" height="115" rx="3" fill="#0C1929" stroke="#38BDF8" stroke-width="1.5"/>
+        <text x="570" y="62" fill="#38BDF8" font-family="JetBrains Mono" font-size="9" text-anchor="middle" letter-spacing="1">ETL PIPELINE</text>
+        <text x="570" y="80" fill="#E2E8F0" font-family="Syne, sans-serif" font-size="12" font-weight="700" text-anchor="middle">Multi-Stage</text>
+        <text x="570" y="96" fill="#E2E8F0" font-family="Syne, sans-serif" font-size="12" font-weight="700" text-anchor="middle">Transform</text>
+
+        <!-- ETL steps -->
+        <rect x="508" y="108" width="60" height="16" rx="2" fill="#0F2031" stroke="#1E3A5F" stroke-width="1"/>
+        <text x="538" y="120" fill="#7DD3FC" font-family="JetBrains Mono" font-size="7" text-anchor="middle">Extract</text>
+
+        <rect x="578" y="108" width="60" height="16" rx="2" fill="#0F2031" stroke="#1E3A5F" stroke-width="1"/>
+        <text x="608" y="120" fill="#7DD3FC" font-family="JetBrains Mono" font-size="7" text-anchor="middle">Clean</text>
+
+        <rect x="508" y="130" width="130" height="16" rx="2" fill="#0F2031" stroke="#1E3A5F" stroke-width="1"/>
+        <text x="573" y="142" fill="#7DD3FC" font-family="JetBrains Mono" font-size="7" text-anchor="middle">Normalize + Load</text>
+
+        <!-- Arrow: ETL → LLM (down) -->
+        <line x1="570" y1="155" x2="570" y2="210" stroke="#38BDF8" stroke-width="1.5" opacity="0.5" marker-end="url(#arrBlue)"/>
+
+        <!-- ── LOCAL LLM ── -->
+        <rect x="490" y="210" width="160" height="80" rx="3" fill="#0C2018" stroke="#34D399" stroke-width="1.5" filter="url(#glow)"/>
+        <text x="570" y="232" fill="#34D399" font-family="JetBrains Mono" font-size="9" text-anchor="middle" letter-spacing="1">LOCAL AI</text>
+        <text x="570" y="252" fill="#E2E8F0" font-family="Syne, sans-serif" font-size="13" font-weight="700" text-anchor="middle">DeepSeek-R1</text>
+        <text x="570" y="268" fill="#6B7280" font-family="JetBrains Mono" font-size="8" text-anchor="middle">via Ollama — no API cost</text>
+        <text x="570" y="282" fill="#34D399" font-family="JetBrains Mono" font-size="7.5" text-anchor="middle">✓ Full data sovereignty</text>
+
+        <!-- Arrow: LLM → DB -->
+        <line x1="650" y1="250" x2="710" y2="250" stroke="#34D399" stroke-width="1.5" opacity="0.6" marker-end="url(#arrGreen)"/>
+
+        <!-- ── STONE CODE PARSER ── -->
+        <rect x="265" y="180" width="160" height="80" rx="3" fill="#131920" stroke="#F59E0B" stroke-width="1"/>
+        <text x="345" y="202" fill="#F59E0B" font-family="JetBrains Mono" font-size="9" text-anchor="middle" letter-spacing="1">PARSER ENGINE</text>
+        <text x="345" y="222" fill="#E2E8F0" font-family="Syne, sans-serif" font-size="12" font-weight="700" text-anchor="middle">Stone Code</text>
+        <text x="345" y="238" fill="#E2E8F0" font-family="Syne, sans-serif" font-size="12" font-weight="700" text-anchor="middle">Decomposer</text>
+        <text x="345" y="253" fill="#6B7280" font-family="JetBrains Mono" font-size="7.5" text-anchor="middle">Name · Material · Finish · Thickness</text>
+
+        <!-- Arrow: Parser → ETL -->
+        <line x1="425" y1="220" x2="490" y2="120" stroke="#F59E0B" stroke-width="1" stroke-dasharray="4,3" opacity="0.4" marker-end="url(#arr)"/>
+
+        <!-- ── SUPABASE / POSTGRES ── -->
+        <rect x="710" y="180" width="160" height="110" rx="3" fill="#131920" stroke="#38BDF8" stroke-width="2" filter="url(#glow)"/>
+        <text x="790" y="204" fill="#38BDF8" font-family="JetBrains Mono" font-size="9" text-anchor="middle" letter-spacing="1">CLOUD DATABASE</text>
+        <text x="790" y="224" fill="#E2E8F0" font-family="Syne, sans-serif" font-size="14" font-weight="700" text-anchor="middle">Supabase</text>
+        <text x="790" y="244" fill="#6B7280" font-family="JetBrains Mono" font-size="9" text-anchor="middle">PostgreSQL</text>
+        <text x="790" y="262" fill="#34D399" font-family="JetBrains Mono" font-size="8" text-anchor="middle">✓ JWT auth hardened</text>
+        <text x="790" y="277" fill="#34D399" font-family="JetBrains Mono" font-size="8" text-anchor="middle">✓ Env vars secured</text>
+
+        <!-- ── LAUNCHD ── -->
+        <rect x="710" y="60" width="160" height="70" rx="3" fill="#131920" stroke="#374151" stroke-width="1"/>
+        <text x="790" y="84" fill="#9CA3AF" font-family="JetBrains Mono" font-size="9" text-anchor="middle" letter-spacing="1">SCHEDULER</text>
+        <text x="790" y="104" fill="#E2E8F0" font-family="Syne, sans-serif" font-size="13" font-weight="700" text-anchor="middle">macOS Launchd</text>
+        <text x="790" y="120" fill="#6B7280" font-family="JetBrains Mono" font-size="8" text-anchor="middle">24/7 background sync</text>
+
+        <!-- Arrow: Launchd → CSV Bridge (triggers) -->
+        <line x1="710" y1="95" x2="428" y2="95" stroke="#6B7280" stroke-width="1" stroke-dasharray="4,3" opacity="0.4" marker-end="url(#arr)"/>
+
+        <!-- Arrow: Supabase → DB to Mobile -->
+        <line x1="790" y1="290" x2="790" y2="360" stroke="#38BDF8" stroke-width="1.5" opacity="0.5" marker-end="url(#arrBlue)"/>
+
+        <!-- Arrow: Launchd → Supabase (right side) -->
+        <line x1="790" y1="130" x2="790" y2="180" stroke="#6B7280" stroke-width="1" stroke-dasharray="3,3" opacity="0.35" marker-end="url(#arr)"/>
+
+        <!-- ── REACT NATIVE APP ── -->
+        <rect x="660" y="360" width="260" height="80" rx="3" fill="#0C1929" stroke="#38BDF8" stroke-width="1.5"/>
+        <text x="790" y="385" fill="#38BDF8" font-family="JetBrains Mono" font-size="9" text-anchor="middle" letter-spacing="1">MOBILE APP</text>
+        <text x="790" y="405" fill="#E2E8F0" font-family="Syne, sans-serif" font-size="14" font-weight="700" text-anchor="middle">React Native (TypeScript)</text>
+        <text x="790" y="422" fill="#6B7280" font-family="JetBrains Mono" font-size="8" text-anchor="middle">Real-time inventory · Sales team field access</text>
+
+        <!-- ── CLEANING PIPELINE ── -->
+        <rect x="30" y="200" width="200" height="100" rx="3" fill="#131920" stroke="#374151" stroke-width="1"/>
+        <text x="130" y="222" fill="#9CA3AF" font-family="JetBrains Mono" font-size="9" text-anchor="middle" letter-spacing="1">CLEANING PIPELINE</text>
+        <text x="130" y="245" fill="#E2E8F0" font-family="Syne, sans-serif" font-size="11" font-weight="700" text-anchor="middle">Artifact Removal</text>
+        <text x="130" y="262" fill="#6B7280" font-family="JetBrains Mono" font-size="7.5" text-anchor="middle">Pagination · Metadata</text>
+        <text x="130" y="276" fill="#6B7280" font-family="JetBrains Mono" font-size="7.5" text-anchor="middle">Pricing logic · Deduplication</text>
+        <text x="130" y="291" fill="#6B7280" font-family="JetBrains Mono" font-size="7.5" text-anchor="middle">Consistency checks</text>
+
+        <!-- Arrow: Cleaner → ETL -->
+        <line x1="230" y1="250" x2="490" y2="120" stroke="#6B7280" stroke-width="1" stroke-dasharray="4,3" opacity="0.35" marker-end="url(#arr)"/>
+
+        <!-- Legend -->
+        <rect x="30" y="370" width="460" height="80" rx="3" fill="#0D1117" stroke="#1E2A38" stroke-width="1"/>
+        <text x="52" y="392" fill="#6B7280" font-family="JetBrains Mono" font-size="8" letter-spacing="2">LEGEND</text>
+
+        <line x1="52" y1="410" x2="80" y2="410" stroke="#F59E0B" stroke-width="1.5" marker-end="url(#arr)"/>
+        <text x="88" y="414" fill="#9CA3AF" font-family="JetBrains Mono" font-size="7.5">Primary data flow</text>
+
+        <line x1="52" y1="430" x2="80" y2="430" stroke="#6B7280" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+        <text x="88" y="434" fill="#9CA3AF" font-family="JetBrains Mono" font-size="7.5">Triggered / scheduled</text>
+
+        <rect x="200" y="398" width="12" height="12" rx="1" fill="#131920" stroke="#F59E0B" stroke-width="1.5"/>
+        <text x="220" y="409" fill="#9CA3AF" font-family="JetBrains Mono" font-size="7.5">AI system</text>
+
+        <rect x="200" y="420" width="12" height="12" rx="1" fill="#131920" stroke="#38BDF8" stroke-width="1.5"/>
+        <text x="220" y="431" fill="#9CA3AF" font-family="JetBrains Mono" font-size="7.5">Database / integration</text>
+
+        <rect x="340" y="398" width="12" height="12" rx="1" fill="#450A0A" stroke="#7F1D1D" stroke-width="1"/>
+        <text x="360" y="409" fill="#9CA3AF" font-family="JetBrains Mono" font-size="7.5">Bypassed legacy</text>
+
+        <rect x="340" y="420" width="12" height="12" rx="1" fill="#131920" stroke="#374151" stroke-width="1"/>
+        <text x="360" y="431" fill="#9CA3AF" font-family="JetBrains Mono" font-size="7.5">Infrastructure</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════ 5 SYSTEMS ════════════════════════════ -->
+<section id="systems" style="padding: 6rem 0;">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-number">03 —</span>
+      <h2 class="section-title">Core Systems Built</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="systems-grid">
+
+      <!-- System 1 -->
+      <div class="card system-card reveal">
+        <span class="system-num">01</span>
+        <div class="system-tag">AI / LLM</div>
+        <h3>Local-First AI Engine</h3>
+        <p>Deployed DeepSeek-R1 via Ollama as an on-premises inference layer. Eliminated recurring cloud AI API costs entirely. All inference happens locally — zero data leaves the system, achieving full data sovereignty. The model handles unstructured inventory normalisation with high accuracy.</p>
+        <div class="tech-pills">
+          <span class="pill">DeepSeek-R1</span>
+          <span class="pill">Ollama</span>
+          <span class="pill">Local LLM inference</span>
+          <span class="pill">Data normalisation</span>
+        </div>
+      </div>
+
+      <!-- System 2 -->
+      <div class="card system-card reveal">
+        <span class="system-num">02</span>
+        <div class="system-tag">DATA ENGINEERING</div>
+        <h3>Multi-Stage ETL Pipeline</h3>
+        <p>Engineered a complete extraction, transformation, and loading pipeline in Python 3.12. Handles data from legacy ERP through cleaning, AI normalisation, Stone Code parsing, and final structured load into Supabase/PostgreSQL — fully automated end-to-end.</p>
+        <div class="tech-pills">
+          <span class="pill">Python 3.12</span>
+          <span class="pill">ETL Design</span>
+          <span class="pill">Supabase</span>
+          <span class="pill">PostgreSQL</span>
+          <span class="pill">Data pipeline</span>
+        </div>
+      </div>
+
+      <!-- System 3 — Featured -->
+      <div class="card system-card featured reveal">
+        <span class="system-num">03</span>
+        <div class="system-tag">SYSTEMS ARCHITECTURE</div>
+        <h3>Fishbowl API Bypass — Legacy Integration Strategy</h3>
+        <p>The ERP vendor's REST/XML socket API was fundamentally unreliable — sync failures were routine and unresolvable through conventional debugging. Rather than continuing to fight an unmaintainable integration, the decision was made to architect a bypass entirely. This involved reverse-engineering the ERP's CSV export capability, designing a deterministic file-watch pipeline, and building a direct CSV-to-Supabase ingestion bridge. The result: a simpler, faster, and completely reliable data pathway that outperforms the official API in every measurable dimension.</p>
+        <p style="margin-top:0.5rem;"><em style="color:var(--amber);font-size:0.82rem;">Key insight: sometimes the correct architectural decision is to eliminate the dependency entirely, not to fix it.</em></p>
+        <div class="tech-pills">
+          <span class="pill">API bypass strategy</span>
+          <span class="pill">Legacy modernisation</span>
+          <span class="pill">CSV ingestion</span>
+          <span class="pill">ERP integration</span>
+          <span class="pill">Architectural decision-making</span>
+          <span class="pill">Fishbowl ERP</span>
+        </div>
+      </div>
+
+      <!-- System 4 -->
+      <div class="card system-card reveal">
+        <span class="system-num">04</span>
+        <div class="system-tag">PARSING ENGINE</div>
+        <h3>Stone Code Decomposer</h3>
+        <p>Built a proprietary parsing engine to decompose free-text product identifiers ("Stone Codes") into four structured relational attributes: Name, Material, Finish, and Thickness. This converted an unsearchable catalogue into a fully queryable, filterable data structure — unlocking advanced inventory analytics that were previously impossible.</p>
+        <div class="tech-pills">
+          <span class="pill">Custom parser</span>
+          <span class="pill">String decomposition</span>
+          <span class="pill">Structured attributes</span>
+          <span class="pill">Catalogue intelligence</span>
+        </div>
+      </div>
+
+      <!-- System 5 -->
+      <div class="card system-card reveal">
+        <span class="system-num">05</span>
+        <div class="system-tag">MOBILE / SECURITY</div>
+        <h3>Mobile Integration & Security Layer</h3>
+        <p>Integrated the entire backend system with a React Native TypeScript mobile application delivering real-time inventory access for sales teams. Applied production security hardening: Supabase JWT key rotation, environment variable isolation, and vulnerability remediation — resulting in a secure, audit-ready deployment.</p>
+        <div class="tech-pills">
+          <span class="pill">React Native</span>
+          <span class="pill">TypeScript</span>
+          <span class="pill">JWT security</span>
+          <span class="pill">macOS Launchd</span>
+          <span class="pill">Environment hardening</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════ DECISIONS ════════════════════════════ -->
+<section id="decisions">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-number">04 —</span>
+      <h2 class="section-title">Architectural Decisions</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="reveal">
+      <table class="decision-table">
+        <thead>
+          <tr>
+            <th>Decision</th>
+            <th>Alternative Rejected</th>
+            <th>Choice Made</th>
+            <th>Rationale</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>AI Processing</td>
+            <td>OpenAI / Anthropic cloud API</td>
+            <td>Local LLM (DeepSeek-R1 via Ollama)</td>
+            <td>Eliminates recurring cost, ensures data stays on-premise, no API rate limits or outage dependency</td>
+          </tr>
+          <tr>
+            <td>ERP Integration</td>
+            <td>Fix & maintain Fishbowl REST/XML API</td>
+            <td>Full API bypass via CSV bridge</td>
+            <td>API was architecturally unreliable; bypass was simpler, faster, and more maintainable</td>
+          </tr>
+          <tr>
+            <td>Database</td>
+            <td>On-premise MySQL / SQLite</td>
+            <td>Supabase (hosted PostgreSQL)</td>
+            <td>Real-time capabilities, REST API out of the box, React Native SDK, JWT auth — at near-zero cost</td>
+          </tr>
+          <tr>
+            <td>Scheduling</td>
+            <td>Cron jobs / manual triggers</td>
+            <td>macOS Launchd daemons</td>
+            <td>Native OS-level process management with automatic restart on failure — more reliable than cron in practice</td>
+          </tr>
+          <tr>
+            <td>Mobile Stack</td>
+            <td>Native iOS / Android or PWA</td>
+            <td>React Native (TypeScript)</td>
+            <td>Single codebase, strong TypeScript safety, Supabase client compatibility, fast iteration</td>
+          </tr>
+          <tr>
+            <td>Data Parsing</td>
+            <td>Manual taxonomy / spreadsheet lookup</td>
+            <td>Custom Stone Code parser engine</td>
+            <td>Automated, scalable decomposition of all future inventory data without human review</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════ IMPACT ══════════════════════════════ -->
+<section id="impact" style="padding: 6rem 0;">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-number">05 —</span>
+      <h2 class="section-title">Business Impact</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="impact-grid reveal">
+      <div class="impact-cell">
+        <div class="impact-metric">$0</div>
+        <div class="impact-label">Ongoing AI API Cost</div>
+        <div class="impact-sub">Eliminated recurring cloud AI spend by deploying a fully local inference engine</div>
+      </div>
+      <div class="impact-cell">
+        <div class="impact-metric">100%</div>
+        <div class="impact-label">Data Sovereignty</div>
+        <div class="impact-sub">All inventory data processed locally — no external API exposure, no third-party data risk</div>
+      </div>
+      <div class="impact-cell">
+        <div class="impact-metric">0</div>
+        <div class="impact-label">Manual Sync Operations</div>
+        <div class="impact-sub">Full 24/7 automation via Launchd — self-healing on failure, no human intervention required</div>
+      </div>
+      <div class="impact-cell">
+        <div class="impact-metric">1,000+</div>
+        <div class="impact-label">SKUs Structured</div>
+        <div class="impact-sub">Unstructured product catalogue converted into queryable, filterable relational data</div>
+      </div>
+      <div class="impact-cell">
+        <div class="impact-metric">4</div>
+        <div class="impact-label">Systems Integrated</div>
+        <div class="impact-sub">Legacy ERP → ETL Pipeline → Local AI → Cloud DB → Mobile App — end-to-end</div>
+      </div>
+      <div class="impact-cell">
+        <div class="impact-metric">∞</div>
+        <div class="impact-label">Real-Time Access</div>
+        <div class="impact-sub">Sales teams moved from zero field visibility to live inventory access on mobile devices</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════ TECH STACK ═══════════════════════════ -->
+<section id="stack">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-number">06 —</span>
+      <h2 class="section-title">Technology Stack</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="stack-grid reveal">
+      <div class="stack-group">
+        <div class="stack-group-label">AI / ML</div>
+        <div class="stack-item"><div class="stack-dot dot-green"></div>DeepSeek-R1</div>
+        <div class="stack-item"><div class="stack-dot dot-green"></div>Ollama</div>
+        <div class="stack-item"><div class="stack-dot dot-green"></div>Local LLM inference</div>
+        <div class="stack-item"><div class="stack-dot dot-green"></div>Data normalisation</div>
+      </div>
+      <div class="stack-group">
+        <div class="stack-group-label">Backend / Data</div>
+        <div class="stack-item"><div class="stack-dot dot-amber"></div>Python 3.12</div>
+        <div class="stack-item"><div class="stack-dot dot-amber"></div>Supabase</div>
+        <div class="stack-item"><div class="stack-dot dot-amber"></div>PostgreSQL</div>
+        <div class="stack-item"><div class="stack-dot dot-amber"></div>ETL Pipeline</div>
+        <div class="stack-item"><div class="stack-dot dot-amber"></div>Custom Parser Engine</div>
+      </div>
+      <div class="stack-group">
+        <div class="stack-group-label">Frontend / Mobile</div>
+        <div class="stack-item"><div class="stack-dot dot-blue"></div>React Native</div>
+        <div class="stack-item"><div class="stack-dot dot-blue"></div>TypeScript</div>
+        <div class="stack-item"><div class="stack-dot dot-blue"></div>Supabase SDK</div>
+        <div class="stack-item"><div class="stack-dot dot-blue"></div>Real-time subscriptions</div>
+      </div>
+      <div class="stack-group">
+        <div class="stack-group-label">Infra / Security</div>
+        <div class="stack-item"><div class="stack-dot dot-red"></div>macOS Launchd</div>
+        <div class="stack-item"><div class="stack-dot dot-red"></div>JWT key management</div>
+        <div class="stack-item"><div class="stack-dot dot-red"></div>Environment hardening</div>
+        <div class="stack-item"><div class="stack-dot dot-red"></div>Fishbowl ERP (bypassed)</div>
+        <div class="stack-item"><div class="stack-dot dot-red"></div>CSV ingestion bridge</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════ SKILLS PROOF ═════════════════════════ -->
+<section id="skills" style="padding: 6rem 0;">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-number">07 —</span>
+      <h2 class="section-title">Skills This Project Proves</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="skills-grid">
+      <div class="card skill-card reveal">
+        <span class="skill-icon">⬡</span>
+        <h4>AI Systems Architecture</h4>
+        <p>Designed, deployed, and integrated a local LLM inference engine into a production system — not a demo. Solved a real cost and privacy problem with a concrete AI solution.</p>
+      </div>
+      <div class="card skill-card reveal">
+        <span class="skill-icon">⬡</span>
+        <h4>Legacy System Modernisation</h4>
+        <p>Diagnosed a failing vendor API, made the strategic call to bypass it entirely, and built a replacement integration that outperforms the original across all metrics.</p>
+      </div>
+      <div class="card skill-card reveal">
+        <span class="skill-icon">⬡</span>
+        <h4>Data Engineering</h4>
+        <p>Built a multi-stage ETL pipeline from scratch — extraction, cleaning, AI normalisation, structured parsing, and cloud database loading — fully automated.</p>
+      </div>
+      <div class="card skill-card reveal">
+        <span class="skill-icon">⬡</span>
+        <h4>Systems Thinking</h4>
+        <p>Held the entire system in mind from legacy source to mobile endpoint — making trade-off decisions at each layer that optimised for reliability, cost, and maintainability.</p>
+      </div>
+      <div class="card skill-card reveal">
+        <span class="skill-icon">⬡</span>
+        <h4>Security Engineering</h4>
+        <p>Applied production security practices: JWT rotation, environment variable isolation, and vulnerability remediation — delivering an audit-ready deployment, not just a functional one.</p>
+      </div>
+      <div class="card skill-card reveal">
+        <span class="skill-icon">⬡</span>
+        <h4>End-to-End Product Delivery</h4>
+        <p>Took this from zero — no system existed. Scoped, architected, built, secured, and shipped a full-stack AI-powered product that is live in production.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════ IDENTITY ════════════════════════════ -->
+<section id="identity">
+  <div class="container">
+    <div class="identity-inner">
+      <div>
+        <div class="identity-name">Roshan Sapkota</div>
+        <div class="identity-role">◈ LEAD AI SOLUTIONS ARCHITECT  ·  ICT BUSINESS ANALYST  ·  SYDNEY, NSW</div>
+        <div style="margin-top:1.5rem;" class="acs-badges">
+          <div class="acs-badge">ACS ✓ ANZSCO 261111 — ICT Business Analyst — Suitable</div>
+          <div class="acs-badge">ACS ✓ ANZSCO 224114 — Data Analyst — Suitable</div>
+          <div class="acs-badge">ACS ✓ ANZSCO 262111 — Database Administrator — Suitable</div>
+        </div>
+      </div>
+      <div class="contact-block">
+        <div class="contact-item"><span>roshansapkota2019@gmail.com</span></div>
+        <div class="contact-item"><span>+61 452 395 953</span></div>
+        <div class="contact-item">Sydney, New South Wales, Australia</div>
+        <div class="contact-item" style="margin-top:0.5rem;">ACS Member · Professional Year (ICT)</div>
+        <div class="contact-item">MIT — King's Own Institute · BSc CS/IT — Tribhuvan University</div>
+      </div>
+    </div>
+    <div style="margin-top:3rem;padding-top:2rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--muted);">PROJECT STONECAT — PORTFOLIO CASE STUDY</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--muted);">ROSHAN SAPKOTA © 2025</span>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
